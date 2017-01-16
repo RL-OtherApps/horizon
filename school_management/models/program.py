@@ -335,6 +335,10 @@ class Cycle(models.Model):
     type = fields.Selection([
             ('long','Long'),
             ('short', 'Short'),
+            ('talent', 'Young talent'),
+            ('free', 'Free'),
+            ('aess', 'AESS'),
+            ('erasmus', 'Erasmus'),
         ], string='Type')
     grade = fields.Char(required=True, string='Grade', size=60)
     

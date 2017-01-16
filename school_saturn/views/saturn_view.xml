@@ -57,15 +57,15 @@
                 <group cols="2">
                     <field name="source_model"/>
                     <field name="source_domain" placeholder="A domain to filter source records e.g. [('name','like','Test')]"/>
-                    <field name="statistic_field_ids">
-                      <tree string="Fields">
-                        <field name="sequence" />
-                        <field name="code" />
-                        <field name="name" />
-                        <field name="type" />
-                      </tree>
-                    </field>
                 </group>
+                <field name="statistic_field_ids">
+                  <tree string="Fields">
+                    <field name="sequence" />
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="type" />
+                  </tree>
+                </field>
               </sheet>
             </form>
           </field>
@@ -89,9 +89,9 @@
                     <field name="compute_expression" attrs="{'invisible':[('type','!=','C')]}" placeholder="Python evaluation, record contains the current record"/>
                     <field name="fixed_value" attrs="{'invisible':[('type','!=','F')]}"/>
                     <field name="selection_values" attrs="{'invisible':[('value_type','!=','S')]}" placeholder="'aaa','bbb','ccc'"/>
-                    <separator string="Used in following templates" colspan="2"/>
-                    <field name="statistic_template_ids"/>
                 </group>
+                <separator string="Used in following templates" colspan="2"/>
+                <field name="statistic_template_ids"/>
               </sheet>
             </form>
           </field>
@@ -144,7 +144,7 @@
         </record>
         
         <!-- Statistic Field Value Form View -->
-        <record model="ir.ui.view" id="statistic_field_form">
+        <record model="ir.ui.view" id="statistic_value_form">
           <field name="name">school.statistic_value.view</field>
           <field name="model">school.statistic_value</field>
           <field name="type">form</field>

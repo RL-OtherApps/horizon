@@ -20,13 +20,37 @@
 ##############################################################################
 
 import logging
+import time
+import datetime
+import dateutil
+import pytz
+import traceback
 
 from openerp import api, fields, models, _
 from openerp.exceptions import UserError, ValidationError
 from openerp.addons.report_xlsx.report.report_xlsx import ReportXlsx
-from openerp.tools.safe_eval import safe_eval
+from openerp.tools.safe_eval import safe_eval as eval
+from openerp.tools import ustr
 
 _logger = logging.getLogger(__name__)
+
+class Section(models.Model):
+    '''Section'''
+    _inherit = 'school.section'
+
+    saturn_code = fields.Char(string="Saturn Code")
+
+class Track(models.Model):
+    '''Track'''
+    _inherit = 'school.track'
+
+    saturn_code = fields.Char(string="Saturn Code")
+
+class Speciality(models.Model):
+    '''Speciality'''
+    _inherit = 'school.speciality'
+
+    saturn_code = fields.Char(string="Saturn Code")
 
 class StatisticTemplate(models.Model):
     '''Statistic Report'''
@@ -38,32 +62,53 @@ class StatisticTemplate(models.Model):
     source_domain = fields.Text(string='Domain use to filter source model')
     statistic_field_ids = fields.Many2many('school.statistic_field','statistic_template_field_rel','template_id','field_id',string="Fields")
 
-    def _compute_field_value(self, record, field):
+    def _get_eval_context(self, record, field, fields_values):
+        user = self.env['res.users'].browse(self.env.uid)
+        return {
+            'uid': self.env.uid,
+            'user': user,
+            'time': time,
+            'datetime': datetime,
+            'dateutil': dateutil,
+            # NOTE: only `timezone` function. Do not provide the whole `pytz` module as users
+            #       will have access to `pytz.os` and `pytz.sys` to do nasty things...
+            'timezone': pytz.timezone,
+            'env': self.env,
+            'record': record,
+            'field': field,
+            'fields_values': fields_values,
+        }
+        
+    def _compute_field_value(self, record, field, fields_values):
+        eval_context = self._get_eval_context(record, field, fields_values)
         if field.type == 'F':
+            fields_values[field.code] = field.fixed_value
             return {
                 'field_id': field.id,
                 'char_value' : field.fixed_value # TODO : should we handle other type of field ??
             }
         if field.type == 'C':
+            val = eval(field.compute_expression, eval_context, nocopy=True)
+            fields_values[field.code] = val
             if field.value_type == 'C' : 
                 return  {
                     'field_id': field.id,    
-                    'char_value' : eval(field.compute_expression)
+                    'char_value' : val,
                 }
             if field.value_type == 'F' : 
                 return  {
                     'field_id': field.id,    
-                    'float_value' : eval(field.compute_expression)
+                    'float_value' : val,
                 }
             if field.value_type == 'I' : 
                 return  {
                     'field_id': field.id,    
-                    'integer_value' : eval(field.compute_expression)
+                    'integer_value' : val,
                 }
             if field.value_type == 'D' : 
                 return  {
                     'field_id': field.id,    
-                    'date_value' : eval(field.compute_expression) # TODO : encode date ??
+                    'date_value' : val,
                 }
         if field.type == 'M':
             return  {
@@ -76,24 +121,38 @@ class StatisticTemplate(models.Model):
         report = self.env['school.statistic_report'].create({
                 'template_id' : self.id,
         })
-        records = []
         if self.source_domain:
             domain = eval(self.source_domain)
         else:
             domain = []
         _logger.info('Get %s using domain %s' % (self.source_model,domain))
         record_ids = self.env[self.source_model].search(domain)
+        records = []
         for record in record_ids:
             fields = []
+            fields_values = {}
             for field in self.statistic_field_ids:
-                _logger.info('Append %s' % (self._compute_field_value(record, field)))
-                fields.append((0,0,self._compute_field_value(record, field)))
+                try:
+                    val = self._compute_field_value(record, field, fields_values)
+                except Exception as e:
+                    raise UserError(_('Cannot compute value for the field %s.\nRecord:\n%s\n\nTechnical Details:\n%s') % (field.name,record.id,traceback.format_exc()))
+                fields.append((0,0,val))
             records.append((0,0,{
                 'name': record.name,
                 'source_id': record.id,
                 'value_ids': fields,
             }))
-        report.write({'record_ids': records})
+            _logger.info('Add record %s' % (record.id))
+            if len(records) > 30:
+                _logger.info('Write %i records' % (len(records)))
+                report.write({'record_ids': records})
+                records = []
+        if len(records) > 0:
+            _logger.info('Write %i records' % (len(records)))
+            report.write({'record_ids': records})
+            records = []
+        
+        _logger.info('Write report')
         return {
             'name': _('Statistic Report'),
             'domain': [('template_id', '=', self.id)],
@@ -163,8 +222,8 @@ class StatisticValue(models.Model):
     
     char_value = fields.Char(string="Char Value")
     date_value = fields.Date(string="Date Value")
-    float_value = fields.Date(string="Float Value")
-    integer_value = fields.Date(string="Integer Value")
+    float_value = fields.Float(string="Float Value")
+    integer_value = fields.Integer(string="Integer Value")
 
     @api.one
     def _compute_selection(self):
@@ -178,7 +237,7 @@ class StatisticValue(models.Model):
         if self.value_type == 'C':
             self.value = self.char_value
         elif self.value_type == 'D':
-            self.value = self.date_value
+            self.value = fields.Date.from_string(self.date_value).strftime("%d/%m/%Y") if self.date_value else ''
         elif self.value_type == 'F':
             self.value = self.float_value
         elif self.value_type == 'I':
@@ -189,10 +248,23 @@ class StatisticValue(models.Model):
 class StatisticXlsx(ReportXlsx):
 
     def generate_xlsx_report(self, workbook, data, reports):
-        for obj in reports:
-            report_name = obj.template_id.name
+        for report in reports:
+            report_name = report.template_id.name
             sheet = workbook.add_worksheet(report_name[:31])
             bold = workbook.add_format({'bold': True})
-            sheet.write(0, 0, obj.template_id.name, bold)
+            i = 0
+            for field in report.template_id.statistic_field_ids:
+                sheet.write(0, i, field.name, bold)
+                sheet.write(1, i, field.code, bold)
+                i += 1
+            i = 0
+            j = 2
+            for record in report.record_ids:
+                for value in record.value_ids:
+                    if value.value:
+                        sheet.write(j, i, value.value)
+                    i += 1
+                i = 0
+                j += 1
 
 StatisticXlsx('report.statistic_report.xlsx','school.statistic_report')
