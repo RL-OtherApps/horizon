@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+##############################################################################
+#
+#    Copyright (c) 2015 be-cloud.be
+#                       Jerome Sonnet <jerome.sonnet@be-cloud.be>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
+-->
+<openerp>
+    <data>
+            
+        <menuitem name="Statistics" id="menu_statistics" sequence="100" parent="school_management.menu_report"/>
+        
+        <!-- Statistic Report Tree View -->
+        <record id="view_statistic_template_tree" model="ir.ui.view">
+          <field name="name">school.statistic_template.tree</field>
+          <field name="model">school.statistic_template</field>
+          <field eval="8" name="priority" />
+          <field name="arch" type="xml">
+            <tree string="Statistic Templates">
+              <field name="name" />
+              <field name="source_model"/>
+            </tree>
+          </field>
+        </record>
+    
+        <!-- Statistic Template Form View -->
+        <record model="ir.ui.view" id="statistic_template_form">
+          <field name="name">school.statistic_template.view</field>
+          <field name="model">school.statistic_template</field>
+          <field name="type">form</field>
+          <field name="arch" type="xml">
+            <form string="Statistic Template">
+              <header>
+                <button name="generate" type="object" string="Generate Report" class="oe_highlight"/>
+              </header>
+              <sheet>
+                <div class="oe_title">
+                  <h1>
+                   <field name="name"/>
+                  </h1>
+                </div>
+                <group cols="2">
+                    <field name="source_model"/>
+                    <field name="source_domain" placeholder="A domain to filter source records e.g. [('name','like','Test')]"/>
+                    <field name="statistic_field_ids">
+                      <tree string="Fields">
+                        <field name="sequence" />
+                        <field name="code" />
+                        <field name="name" />
+                        <field name="type" />
+                      </tree>
+                    </field>
+                </group>
+              </sheet>
+            </form>
+          </field>
+        </record>
+        
+        <!-- Statistic Field Form View -->
+        <record model="ir.ui.view" id="statistic_field_form">
+          <field name="name">school.statistic_field.view</field>
+          <field name="model">school.statistic_field</field>
+          <field name="type">form</field>
+          <field name="arch" type="xml">
+            <form string="Statistic Field">
+              <sheet>
+                <group cols="2">
+                    <field name="sequence"/>
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <separator string="Values" colspan="2"/>
+                    <field name="value_type"/>
+                    <field name="compute_expression" attrs="{'invisible':[('type','!=','C')]}" placeholder="Python evaluation, record contains the current record"/>
+                    <field name="fixed_value" attrs="{'invisible':[('type','!=','F')]}"/>
+                    <field name="selection_values" attrs="{'invisible':[('value_type','!=','S')]}" placeholder="'aaa','bbb','ccc'"/>
+                    <separator string="Used in following templates" colspan="2"/>
+                    <field name="statistic_template_ids"/>
+                </group>
+              </sheet>
+            </form>
+          </field>
+        </record>
+    
+        <record id="action_statistic_template_tree" model="ir.actions.act_window">
+          <field name="name">Statistic Template</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">school.statistic_template</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to add a Statistic Template.
+            </p>
+            <p>
+              Odoo helps you easily track all activities related to a statistic_template.
+            </p>
+          </field>
+        </record>
+    
+        <record id="action_statistic_template_tree_tree_view1" model="ir.actions.act_window.view">
+          <field name="sequence" eval="1" />
+          <field name="view_mode">tree</field>
+          <field name="view_id" ref="view_statistic_template_tree" />
+          <field name="act_window_id" ref="action_statistic_template_tree" />
+        </record>
+        
+        <record id="action_statistic_template_tree_form_view2" model="ir.actions.act_window.view">
+              <field name="sequence" eval="2" />
+              <field name="view_mode">form</field>
+              <field name="view_id" ref="statistic_template_form" />
+              <field name="act_window_id" ref="action_statistic_template_tree" />
+        </record>
+            
+        <menuitem id="menu_statistic_template_tree" parent="menu_statistics" action="action_statistic_template_tree" sequence="10"/>
+            
+            
+        <!-- Statistic Record Tree View -->
+        <record id="view_statistic_record_tree" model="ir.ui.view">
+          <field name="name">school.statistic_record.tree</field>
+          <field name="model">school.statistic_record</field>
+          <field eval="8" name="priority" />
+          <field name="arch" type="xml">
+            <tree string="Statistic Records" create="0">
+                <field name="name"/>
+                <field name="source_id"/>
+            </tree>
+          </field>
+        </record>
+        
+        <!-- Statistic Field Value Form View -->
+        <record model="ir.ui.view" id="statistic_field_form">
+          <field name="name">school.statistic_value.view</field>
+          <field name="model">school.statistic_value</field>
+          <field name="type">form</field>
+          <field name="arch" type="xml">
+            <form string="Statistic Field Value">
+              <sheet>
+                <group cols="2">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="value_type"/>
+                    <field name="value"/>
+                    <field name="char_value" attrs="{'invisible':[('value_type','!=','C')]}"/>
+                    <field name="date_value" attrs="{'invisible':[('value_type','!=','D')]}"/>
+                    <field name="integer_value" attrs="{'invisible':[('value_type','!=','I')]}"/>
+                    <field name="float_value" attrs="{'invisible':[('value_type','!=','F')]}"/>
+                    <field name="selection_value" attrs="{'invisible':[('value_type','!=','S')]}"/>
+                </group>
+              </sheet>
+            </form>
+          </field>
+        </record>
+        
+        <!-- Statistic Record Form View -->
+        <record model="ir.ui.view" id="statistic_record_form">
+          <field name="name">school.statistic_record.view</field>
+          <field name="model">school.statistic_record</field>
+          <field name="type">form</field>
+          <field name="arch" type="xml">
+            <form string="Statistic Record">
+              <sheet>
+                <div class="oe_title">
+                  <h1>
+                   <field name="name"/>
+                  </h1>
+                </div>
+                <field name="value_ids">
+                  <tree string="Values">
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="type" />
+                    <field name="value_type" />
+                    <field name="value" />
+                  </tree>
+                </field>
+              </sheet>
+            </form>
+          </field>
+        </record>
+        
+        <record id="view_record_filter" model="ir.ui.view">
+          <field name="name">statistic_record.select</field>
+          <field name="model">school.statistic_record</field>
+          <field name="arch" type="xml">
+            <search string="Search Records">
+              <field name="report_id"/>
+            </search>
+          </field>
+        </record>
+            
+        <record id="act_report_2_record" model="ir.actions.act_window">
+            <field name="name">Records</field>
+            <field name="res_model">school.statistic_record</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_report_id': active_id}</field>
+            <field name="search_view_id" ref="view_record_filter" />
+        </record>
+            
+        <!-- Statistic Report Tree View -->
+        <record id="view_statistic_report_tree" model="ir.ui.view">
+          <field name="name">school.statistic_report.tree</field>
+          <field name="model">school.statistic_report</field>
+          <field eval="8" name="priority" />
+          <field name="arch" type="xml">
+            <tree string="Statistic Reports" create="0">
+                <field name="__last_update" />
+                <field name="create_uid" />
+                <field name="template_id"/>
+                <field name="record_count"/>
+                <button icon="fa-book" string="Records" type="action" name="%(school_saturn.act_report_2_record)d"/>
+            </tree>
+          </field>
+        </record>
+
+        <record id="action_statistic_report_tree" model="ir.actions.act_window">
+          <field name="name">Statistic Report</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">school.statistic_report</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree</field>
+          <field name="help" type="html">
+            <p>
+              Please go to the Statistic Template menu to generate a new report.
+            </p>
+            <p>
+              Odoo helps you easily track all activities related to a statistic_report.
+            </p>
+          </field>
+        </record>
+    
+        <record id="action_statistic_report_tree_tree_view1" model="ir.actions.act_window.view">
+          <field name="sequence" eval="1" />
+          <field name="view_mode">tree</field>
+          <field name="view_id" ref="view_statistic_report_tree" />
+          <field name="act_window_id" ref="action_statistic_report_tree" />
+        </record>
+
+        <menuitem id="menu_statistic_report_tree" parent="menu_statistics" action="action_statistic_report_tree" sequence="50"/>
+        
+        
+        <report
+            id="statistic_report_xlsx"
+            model="school.statistic_report"
+            string="Statistics Report"
+            report_type="xlsx"
+            name="statistic_report.xlsx"
+            file="statistic_report.xlsx"
+            attachment_use="False"
+        />
+        
+    </data>
+</openerp>

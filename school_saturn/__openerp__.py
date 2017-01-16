@@ -28,6 +28,7 @@
     'depends': ['school_management'],
     'init_xml': [],
     'update_xml': [
+        'views/saturn_view.xml',
     ],
     'demo_xml': [],
     'description': '''
