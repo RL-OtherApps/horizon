@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+##############################################################################
+#
+#    Copyright (c) 2015 be-cloud.be
+#                       Jerome Sonnet <jerome.sonnet@be-cloud.be>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
+-->
+<openerp>
+    <data>
+
+        <!-- Partner -->
+        <record id="view_partners_form_school_stat_fields" model="ir.ui.view">
+            <field name="name">view.res.partner.form.school.stat_fields</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="school_management.view_student_form_school" />
+            <field eval="18" name="priority" />
+            <field name="arch" type="xml">
+                <xpath expr="//notebook[last()]" position="inside">
+                    <page name="historylines" string="Student Statistics Details" attrs="{'invisible': [('student','=',False)]}">
+                        <field name="student_historic_entry_ids">
+                            <field name="condition"/>
+                            <field name="condition"/>
+                            <separator string="History Lines"/>
+                            <tree string="History Lines" context="{'default_student_id' : active_id}" editable="bottom">
+                                <field name="year_id"/>
+                                <field name="activite"/>
+                                <field name="etablissement_id" />
+                                <field name="domain_id" />
+                                <field name="annee" />
+                                <field name="resultat" />
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>
