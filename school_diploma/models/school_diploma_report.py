@@ -22,9 +22,9 @@ import time
 import locale
 from datetime import datetime, date, timedelta
 
-from openerp import api, fields, models, _
-from openerp.exceptions import UserError, ValidationError
-from openerp.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 
 _logger = logging.getLogger(__name__)
 

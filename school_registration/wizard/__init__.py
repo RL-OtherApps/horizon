@@ -18,6 +18,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-import year_opening
-import register_next
-import assign_program
+from . import year_opening
+from . import register_next
+from . import assign_program

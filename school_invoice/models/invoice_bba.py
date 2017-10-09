@@ -18,11 +18,11 @@
 #
 ##############################################################################
 import re, time, random
-from openerp import api
-from openerp.osv import fields, osv
-from openerp.tools.translate import _
+from odoo import api
+from odoo.osv import fields, osv
+from odoo.tools.translate import _
 import logging
-from openerp.exceptions import UserError
+from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 class account_invoice(osv.osv):

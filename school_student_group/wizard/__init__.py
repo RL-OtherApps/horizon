@@ -18,5 +18,5 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-import linked_group_wizard
-import merge_group_wizard
+from . import linked_group_wizard
+from . import merge_group_wizard

@@ -18,5 +18,5 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-import invoice
-import invoice_bba
+from . import invoice
+from . import invoice_bba
