@@ -43,7 +43,7 @@ class website_portal_school_management(http.Controller):
             'bloc': bloc,
             'teachers':teachers,
         }
-        return request.website.render("website_portal_school_management.information", values)
+        return request.render("website_portal_school_management.information", values)
         
     @http.route(['/program'], type='http', auth='public', website=True)
     def program(self, redirect=None, **post):
@@ -51,23 +51,19 @@ class website_portal_school_management(http.Controller):
         values = {
             'programs': programs,
         }
-        return request.website.render("website_portal_school_management.program", values)
+        return request.render("website_portal_school_management.program", values)
         
     @http.route(['/program/<model("school.program"):program>'], type='http', auth='public', website=True)
     def program_details(self, program, redirect=None, **post):
         values = {
             'program': program,
         }
-        return request.website.render("website_portal_school_management.program_details", values)
+        return request.render("website_portal_school_management.program_details", values)
         
     @http.route(['/print_program/<model("school.program"):program>'], type='http', auth='public', website=True)
     def print_program(self, program, redirect=None, **post):
-        
-        report_obj = request.registry['report']
-        cr, uid, context = request.cr, request.uid, request.context
         reportname = 'school_management.report_program_details_content'
-        
-        pdf = report_obj.get_pdf(cr, uid, [program.id], reportname, data=None, context=None)
+        pdf = request.env['report'].sudo().with_context(set_viewport_size=True).get_pdf([program.id], reportname)
         pdfhttpheaders = [('Content-Type', 'application/pdf'), ('Content-Length', len(pdf))]
         return request.make_response(pdf, headers=pdfhttpheaders)
         
@@ -77,11 +73,11 @@ class website_portal_school_management(http.Controller):
         values = {
             'programs': programs,
         }
-        return request.website.render("website_portal_school_management.program_clean", values)
+        return request.render("website_portal_school_management.program_clean", values)
         
     @http.route(['/program_clean/<model("school.program"):program>'], type='http', auth='public', website=True)
     def program_clean_details(self, program, redirect=None, **post):
         values = {
             'program': program,
         }
-        return request.website.render("website_portal_school_management.program_clean_details", values)
+        return request.render("website_portal_school_management.program_clean_details", values)

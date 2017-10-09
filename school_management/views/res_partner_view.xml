@@ -187,6 +187,7 @@
         </record>
 
         <!-- Top menu item -->
+
         <menuitem name="Contacts" id="menu_contacts" icon="fa-user" web_icon="school_management,static/description/icon_contact.png" sequence="40" />
 
         <!-- <menuitem name="Contacts" parent="menu_main_contacts" id="menu_contacts" sequence="1" /> -->

@@ -117,7 +117,7 @@ class Partner(models.Model):
     
     # TODO : This is not working but don't know why
     @api.model
-    def _get_default_image(self, is_company, colorize=False):
+    def _get_default_image(self, partner_type, is_company, parent_id):
         if getattr(threading.currentThread(), 'testing', False) or self.env.context.get('install_mode'):
             return False
 
@@ -127,4 +127,4 @@ class Partner(models.Model):
                 image = f.read()
             return tools.image_resize_image_big(image.encode('base64'))
         else:
-            return super(Partner, self)._get_default_image(is_company, colorize)
+            return super(Partner, self)._get_default_image(partner_type, is_company, parent_id)

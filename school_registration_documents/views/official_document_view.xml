@@ -22,7 +22,7 @@
 -->
 <openerp>
     <data>
-        
+
         <!--<menuitem name="Official Documents" id="menu_official_document" icon="fa-book" web_icon="website_portal_sale,static/description/icon.png" sequence="65" />-->
         
         <!-- Official Document List View -->

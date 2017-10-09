@@ -143,17 +143,17 @@ var EvaluationsAction = Widget.extend({
         this.model = new Model('school.individual_bloc');
         this.program_model = new Model('school.individual_program');
         this.context = new data.CompoundContext();
-        this.school_domain = 1;
-        this.school_session = new Date().getMonth() < 7 ? 1 : 2;
+        this.school_domain = 2;
+        this.school_session = new Date().getMonth() < 7 || new Date().getMonth() > 10 ? 1 : 2;
         this.parent = parent;
-        this.parent.webclient.$el.find('#oe_main_menu_navbar').addClass('o_hidden');
+        this.parent.webclient.$el.find('.navbar').addClass('o_hidden');
     },
     
     start: function() {
         var self = this;
         return new Model("res.users").call("read", [session.uid, ['id','name','current_year_id']]).then(
                     function(user) {
-                        self.user = user;
+                        self.user = user[0];
                         self.year_id = self.user.current_year_id[0];
                         self.year_name = self.user.current_year_id[1];
                         if(self.school_session == 1) {
@@ -183,7 +183,7 @@ var EvaluationsAction = Widget.extend({
         this.groups = [
             {   
                 'id' : 0, 
-                'title' : "Bloc 1",
+                'title' : "Bac 1",
                 'blocs' : [],
                 'school_session' : this.school_session,
                 'is_program' : false, // TODO : Can link to the editor class rather than this
@@ -219,7 +219,6 @@ var EvaluationsAction = Widget.extend({
             
         ];
         var defs = [];
-        
         defs.push(this.model.query(['id','name','student_id','student_name','source_bloc_level','source_bloc_title','state'])
                             .context(this.context)
                             .order_by('student_name')

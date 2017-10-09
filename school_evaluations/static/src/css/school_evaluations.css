@@ -51,11 +51,16 @@ a.o_school_bloc_item {
 
 .bloc_details {
   position: absolute;
-  top: 245px;
+  top: 275px;
   bottom: 0;
   left: 180px;
   right: 0;
-  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.o_school_evaluations {
+  height: 100%;
 }
 
 .o_school_evaluations .oe_form_container{
@@ -115,11 +120,21 @@ a.o_school_bloc_item {
     }
 }
 
+.sidebar ul li {
+    border-bottom: 1px solid rgb(38,90,135);
+}
+
 .sidebar ul li a {
-  padding : 5px;
+    padding : 5px;
+    color : white;
 }
 
 .sidebar ul li a.active {
+    background-color: rgb(40,95,143);
+}
+
+.sidebar ul li a:hover {
+    background-color: rgb(40,95,143);
     color: #ffffff;
     background-color: #00545c;
 }
