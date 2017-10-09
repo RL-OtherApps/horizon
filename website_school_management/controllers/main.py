@@ -21,7 +21,7 @@
 
 import logging
 
-from odoo.addons.website.models.website import slug, unslug
+from odoo.addons.http_routing.models.ir_http import slug, unslug
 
 from odoo import http
 from odoo.http import request
