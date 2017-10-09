@@ -64,7 +64,7 @@ class StudentGroup(models.Model):
     short_name = fields.Char(string='Name', compute='_compute_name', store=True) 
     title = fields.Char(string='Title')
 
-    course_ids = fields.Many2many('school.course', 'group_course_rel', 'group_id', 'course_id', string='Courses', domain=lambda(self): "['|',('teacher_ids', '=', responsible_id),('teacher_ids', 'in', staff_ids)]" if self.type in ['L','F'] else "")
+    course_ids = fields.Many2many('school.course', 'group_course_rel', 'group_id', 'course_id', string='Courses', domain=lambda self : "['|',('teacher_ids', '=', responsible_id),('teacher_ids', 'in', staff_ids)]" if self.type in ['L','F'] else "")
     
     domain_id = fields.Many2one('school.domain', computed='_compute_course_info', store=True)
     speciality_id = fields.Many2one('school.speciality', computed='_compute_course_info', store=True)
