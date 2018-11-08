@@ -37,6 +37,6 @@
         This module adds an interface for Booking management on the web site.
     ''',
     'active': False,
-    'installable': False,
+    'installable': True,
     'application': True,
 }
